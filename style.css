@@ -1,0 +1,557 @@
+:root {
+    --bg-color: #0d0d0d;
+    --text-color: #e0e0e0;
+    --accent-color: #ffffff;
+    --panel-bg: rgba(255, 255, 255, 0.05);
+    --panel-border: rgba(255, 255, 255, 0.1);
+    --font-mono: 'IBM Plex Mono', monospace;
+    --font-ui: 'Inter', sans-serif;
+
+    --matrix-green: #00ff41;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-ui);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Main Layout Structure */
+.app-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+    /* Sidebar | Content */
+    padding: 0;
+    /* Remove padding for flush sidebar */
+    overflow: hidden;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    gap: 20px;
+    min-width: 0;
+    height: 100%;
+}
+
+.app-header h1 {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    text-align: center;
+    opacity: 0.8;
+}
+
+.booth-layout {
+    display: flex;
+    flex-direction: column;
+    /* Stack camera vertically inside main content */
+    flex: 1;
+    min-height: 0;
+}
+
+/* Sidebar Settings Panel */
+.controls-panel {
+    width: 300px;
+    /* Expanded Width */
+    height: 100%;
+    background: rgba(20, 20, 20, 0.98);
+    /* Slightly more opaque */
+    border-right: 1px solid var(--panel-border);
+    display: flex;
+    flex-direction: row;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), width 0.4s;
+    backdrop-filter: blur(20px);
+    z-index: 100;
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* Hidden State (During Capture / Initial) */
+.controls-panel.hidden-panel {
+    transform: translateX(-100%);
+    width: 0;
+    /* Collapse space too */
+    padding: 0;
+    border: none;
+}
+
+.controls-panel.collapsed {
+    width: 48px;
+    /* Classic manually collapsed state */
+}
+
+/* Ensure handle is visible even when collapsed (but not hidden-panel) */
+.drawer-handle {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 48px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.02);
+    border-left: 1px solid var(--panel-border);
+    transition: background 0.2s;
+    z-index: 20;
+}
+
+.controls-panel.hidden-panel .drawer-handle {
+    display: none;
+}
+
+.drawer-handle:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.handle-bar {
+    width: 4px;
+    height: 40px;
+    background: var(--text-color);
+    border-radius: 2px;
+    opacity: 0.3;
+}
+
+.handle-icon {
+    width: 10px;
+    height: 10px;
+    margin-top: 10px;
+    border-right: 2px solid var(--text-color);
+    border-bottom: 2px solid var(--text-color);
+    transform: rotate(-45deg);
+    /* Point Right (collapsed) */
+    transition: transform 0.3s ease, opacity 0.2s;
+    opacity: 0.5;
+}
+
+/* When panel is OPEN (not collapsed), point Left */
+.controls-panel:not(.collapsed) .handle-icon {
+    transform: rotate(135deg);
+    /* Point Left */
+    opacity: 1;
+}
+
+/* Sidebar Content */
+.drawer-content {
+    flex: 1;
+    height: 100%;
+    padding: 24px;
+    padding-right: 60px;
+    /* Space for handle */
+    overflow-y: auto;
+    opacity: 1;
+    transition: opacity 0.3s;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.controls-panel.collapsed .drawer-content {
+    opacity: 0;
+    pointer-events: none;
+    /* Hide content when collapsed to prevent focus/interaction */
+    display: none;
+}
+
+/* Vertical Control Layout */
+.control-row-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.control-group label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #888;
+    letter-spacing: 1px;
+}
+
+/* Camera Section - Grows to fill */
+.camera-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    gap: 20px;
+    transition: flex-grow 0.4s ease;
+}
+
+.monitor-frame {
+    position: relative;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--panel-border);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#webcam-feed,
+#ascii-canvas {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    max-height: 100%;
+}
+
+#webcam-feed {
+    opacity: 1;
+}
+
+#ascii-canvas {
+    image-rendering: pixelated;
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+#ascii-canvas.visible {
+    opacity: 1;
+}
+
+#webcam-feed.hidden-feed {
+    opacity: 0;
+}
+
+/* Side-by-Side View for Strip Results */
+.monitor-frame.split-view {
+    display: block;
+}
+
+.monitor-frame.split-view #result-display,
+.monitor-frame.split-view #ascii-canvas {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 90%;
+    width: auto;
+    max-width: 48%;
+    object-fit: contain;
+    transition: left 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    left: 50%;
+}
+
+.monitor-frame.split-view #result-display {
+    z-index: 2;
+}
+
+.monitor-frame.split-view #ascii-canvas {
+    z-index: 1;
+    opacity: 1;
+    background: #000;
+}
+
+.monitor-frame.split-view.reveal-ascii #result-display {
+    left: 28%;
+}
+
+.monitor-frame.split-view.reveal-ascii #ascii-canvas {
+    left: 72%;
+}
+
+.monitor-frame.split-view #webcam-feed {
+    display: none;
+}
+
+/* Buttons & Inputs */
+/* Auto-Start Mode: Hide initial trigger buttons */
+.mode-selector,
+#btn-capture {
+    display: none !important;
+}
+
+/* Unified Button Styles */
+.btn-primary {
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--panel-border);
+    padding: 10px 20px;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 0.8rem;
+    border-radius: 8px;
+    /* Match toggle-btn */
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-primary:active,
+.btn-secondary:active,
+.landing-btn:active {
+    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--panel-border);
+    padding: 10px 20px;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 0.8rem;
+    border-radius: 8px;
+    /* Match toggle-btn */
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+.btn-secondary:hover,
+.btn-primary:hover,
+.landing-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Landing Buttons */
+.landing-btn {
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--panel-border);
+    padding: 12px 30px;
+    /* Slightly larger for landing but same style */
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    /* Slightly larger text */
+    letter-spacing: 2px;
+    border-radius: 8px;
+    /* Match toggle-btn */
+    cursor: pointer;
+    transition: all 0.3s;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+
+#capture-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.toggle-btn {
+    background: transparent;
+    border: 1px solid var(--panel-border);
+    color: var(--text-color);
+    padding: 10px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toggle-btn.active {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.toggle-group {
+    display: flex;
+    gap: 8px;
+}
+
+.toggle-group .toggle-btn {
+    flex: 1;
+}
+
+/* Utilities */
+.hidden {
+    display: none !important;
+}
+
+/* Range Slider Styling */
+input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    /* standard property */
+    width: 100%;
+    background: transparent;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    cursor: pointer;
+    margin-top: -6px;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    background: var(--panel-border);
+    border-radius: 2px;
+}
+
+/* Overlays */
+#countdown-overlay {
+    position: absolute;
+    font-family: var(--font-mono);
+    font-size: 8rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+
+#flash-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 50;
+    /* Above canvas/video/overlays */
+    transition: opacity 0.05s ease-out;
+}
+
+.flash-active {
+    opacity: 0.6 !important;
+    /* Reduced brightness from 1.0 */
+}
+
+/* Retro Theme Modifiers */
+body.retro-mode {
+    --bg-color: #001100;
+    --text-color: var(--matrix-green);
+    --accent-color: var(--matrix-green);
+    --panel-bg: rgba(0, 255, 65, 0.05);
+    --panel-border: rgba(0, 255, 65, 0.2);
+}
+
+body.retro-mode .monitor-frame {
+    box-shadow: 0 0 30px rgba(0, 255, 65, 0.1);
+    border-color: var(--matrix-green);
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .booth-layout {
+        flex-direction: column;
+    }
+
+    .camera-section {
+        flex: 2;
+    }
+
+    .controls-panel {
+        flex: 1;
+        overflow-y: auto;
+    }
+}
+
+/* Landing Page Overlay */
+#landing-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.8s ease-in-out;
+}
+
+#landing-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.landing-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    width: 100%;
+    max-width: 600px;
+    transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Move content up when ready */
+#landing-overlay.interaction-ready .landing-content {
+    transform: translateY(-10%);
+}
+
+#landing-text {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    color: #fff;
+    letter-spacing: 4px;
+    text-align: center;
+    min-height: 2.4rem;
+    /* unexpected jump prevention */
+}
+
+/* Landing Buttons */
+#landing-controls {
+    display: flex;
+    gap: 20px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+#landing-controls:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Landing Buttons Animation State */
+/* .landing-btn base styles moved to Unified Button Styles above */
+
+.landing-btn.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
