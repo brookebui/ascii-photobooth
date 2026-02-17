@@ -17,7 +17,7 @@
     <!-- Landing Overlay (Restored) -->
     <div id="landing-overlay">
         <div class="landing-content">
-            <h1 id="landing-text" class="glitch-text">INITIALIZING SYSTEM...</h1>
+            <h1 id="landing-text" class="glitch-text"></h1>
             <div id="landing-controls" class="hidden">
                 <button id="btn-start-single" class="landing-btn">SINGLE</button>
                 <button id="btn-start-strip" class="landing-btn">STRIP (4)</button>
@@ -44,6 +44,7 @@
                         <div class="toggle-group" id="charset-toggles">
                             <button class="toggle-btn active" data-set="standard">STD</button>
                             <button class="toggle-btn" data-set="minimal">MIN</button>
+                            <button class="toggle-btn" data-set="binary">BIN</button>
                             <button class="toggle-btn" data-set="blocks">BLK</button>
                         </div>
                     </div>
@@ -55,7 +56,12 @@
 
                     <div class="control-group">
                         <label>THEME</label>
-                        <button id="btn-toggle-retro" class="toggle-btn">RETRO</button>
+                        <div class="toggle-group" id="theme-toggles">
+                            <button class="toggle-btn active" data-theme="classic" title="Classic B&W">BW</button>
+                            <button class="toggle-btn" data-theme="retro" title="Retro Green">RET</button>
+                            <button class="toggle-btn" data-theme="warm" title="Warm Sepia">WRM</button>
+                            <button class="toggle-btn" data-theme="neon" title="Neon Cyber">NEO</button>
+                        </div>
                     </div>
                 </div>
             </div>

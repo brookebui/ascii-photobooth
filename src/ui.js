@@ -32,11 +32,22 @@ export function initUI() {
         toggleColor(colorBtn.classList.contains('active'));
     });
 
-    // Retro Theme Toggle
-    const retroBtn = document.getElementById('btn-toggle-retro');
-    retroBtn.addEventListener('click', () => {
-        retroBtn.classList.toggle('active');
-        document.body.classList.toggle('retro-mode');
+    // Theme Toggles
+    const themeBtns = document.querySelectorAll('#theme-toggles .toggle-btn');
+    themeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            themeBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Remove all theme classes
+            document.body.classList.remove('theme-retro', 'theme-warm', 'theme-neon');
+
+            // Add selected theme class (if not classic)
+            const theme = btn.dataset.theme;
+            if (theme !== 'classic') {
+                document.body.classList.add(`theme-${theme}`);
+            }
+        });
     });
 
     // === DRAWER ===

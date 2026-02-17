@@ -20,6 +20,7 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: var(--font-ui);
+    transition: background-color 0.5s ease, color 0.5s ease;
     height: 100vh;
     display: flex;
     justify-content: center;
@@ -81,6 +82,12 @@ body {
     z-index: 100;
     position: relative;
     flex-shrink: 0;
+    overflow: hidden;
+}
+
+.controls-panel.collapsed {
+    width: 48px;
+    /* Classic manually collapsed state */
 }
 
 /* Hidden State (During Capture / Initial) */
@@ -90,11 +97,6 @@ body {
     /* Collapse space too */
     padding: 0;
     border: none;
-}
-
-.controls-panel.collapsed {
-    width: 48px;
-    /* Classic manually collapsed state */
 }
 
 /* Ensure handle is visible even when collapsed (but not hidden-panel) */
@@ -460,7 +462,9 @@ input[type=range]::-webkit-slider-runnable-track {
 }
 
 /* Retro Theme Modifiers */
-body.retro-mode {
+/* Theme Classes */
+/* Retro Theme (Green Matrix) */
+body.theme-retro {
     --bg-color: #001100;
     --text-color: var(--matrix-green);
     --accent-color: var(--matrix-green);
@@ -468,9 +472,38 @@ body.retro-mode {
     --panel-border: rgba(0, 255, 65, 0.2);
 }
 
-body.retro-mode .monitor-frame {
+body.theme-retro .monitor-frame {
     box-shadow: 0 0 30px rgba(0, 255, 65, 0.1);
     border-color: var(--matrix-green);
+}
+
+/* Warm Theme (Sepia) */
+body.theme-warm {
+    --bg-color: #1a1510;
+    --text-color: #e6cbb3;
+    --accent-color: #ff9d00;
+    --panel-bg: rgba(230, 203, 179, 0.05);
+    --panel-border: rgba(230, 203, 179, 0.15);
+}
+
+body.theme-warm .monitor-frame {
+    box-shadow: 0 0 30px rgba(255, 157, 0, 0.1);
+    border-color: rgba(230, 203, 179, 0.2);
+}
+
+/* Neon Theme (Cyberpunk) */
+body.theme-neon {
+    --bg-color: #050510;
+    --text-color: #00f3ff;
+    --accent-color: #ff00ff;
+    --panel-bg: rgba(0, 243, 255, 0.05);
+    --panel-border: rgba(0, 243, 255, 0.2);
+    text-shadow: 0 0 2px rgba(0, 243, 255, 0.5);
+}
+
+body.theme-neon .monitor-frame {
+    box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+    border-color: var(--text-color);
 }
 
 /* Responsiveness */
