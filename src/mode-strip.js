@@ -76,7 +76,7 @@ export function composeStrip(images) {
     ctx.textBaseline = 'middle';
 
     const date = new Date().toLocaleDateString();
-    ctx.fillText(`PHOTOBOOTH • ${date}`, canvas.width / 2, canvas.height - (footerHeight / 2) - padding / 2);
+    ctx.fillText(`${date}`, canvas.width / 2, canvas.height - (footerHeight / 2) - padding / 2);
 
     return canvas;
 }

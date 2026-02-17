@@ -99,7 +99,16 @@
                         <div id="capture-actions" class="hidden">
                             <button id="btn-view-toggle" class="btn-secondary">SHOW ORIGINAL</button>
                             <button id="btn-retake" class="btn-secondary">RETAKE</button>
-                            <button id="btn-dl-png" class="btn-secondary">SAVE PNG</button>
+
+                            <div class="dropdown">
+                                <button class="btn-secondary">SAVE IMAGE ▼</button>
+                                <div class="dropdown-content">
+                                    <button id="btn-save-original">ORIGINAL</button>
+                                    <button id="btn-save-ascii">ASCII</button>
+                                    <button id="btn-save-both">BOTH</button>
+                                </div>
+                            </div>
+
                             <button id="btn-dl-txt" class="btn-secondary">SAVE TXT</button>
                             <button id="btn-copy" class="btn-secondary">COPY</button>
                         </div>

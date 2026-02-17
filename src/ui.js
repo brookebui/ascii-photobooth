@@ -82,7 +82,9 @@ export function initUI() {
     const captureBtn = document.getElementById('btn-capture');
     const captureActions = document.getElementById('capture-actions');
     const retakeBtn = document.getElementById('btn-retake');
-    const dlPngBtn = document.getElementById('btn-dl-png');
+    const btnSaveOriginal = document.getElementById('btn-save-original');
+    const btnSaveAscii = document.getElementById('btn-save-ascii');
+    const btnSaveBoth = document.getElementById('btn-save-both');
     const dlTxtBtn = document.getElementById('btn-dl-txt');
     const copyBtn = document.getElementById('btn-copy');
     const viewToggleBtn = document.getElementById('btn-view-toggle');
@@ -107,7 +109,13 @@ export function initUI() {
         resetToModeSelection();
     });
 
-    dlPngBtn.addEventListener('click', downloadPNG);
+    btnSaveOriginal.addEventListener('click', () => downloadImage('original'));
+    btnSaveAscii.addEventListener('click', () => downloadImage('ascii'));
+    btnSaveBoth.addEventListener('click', () => {
+        downloadImage('original');
+        setTimeout(() => downloadImage('ascii'), 200);
+    });
+
     dlTxtBtn.addEventListener('click', downloadTXT);
     copyBtn.addEventListener('click', copyToClipboard);
 
@@ -286,14 +294,34 @@ export function initUI() {
         setSource(videoElement);
     }
 
-    function downloadPNG() {
-        const canvas = getCanvas();
-        if (!canvas) return;
-
+    function downloadImage(type) {
+        console.log('downloadImage called with type:', type);
+        const timestamp = Date.now();
         const link = document.createElement('a');
-        link.download = `ascii-photo-${Date.now()}.png`;
-        link.href = canvas.toDataURL('image/png');
+
+        if (type === 'ascii') {
+            const canvas = getCanvas();
+            console.log('Getting canvas:', canvas);
+            if (!canvas) {
+                console.error('Canvas not found');
+                return;
+            }
+            link.download = `ascii-photo-${timestamp}-ascii.png`;
+            link.href = canvas.toDataURL('image/png');
+        } else if (type === 'original') {
+            console.log('Result display src length:', resultDisplay.src ? resultDisplay.src.length : 0);
+            if (!resultDisplay.src || resultDisplay.src === '#' || resultDisplay.src === window.location.href) {
+                console.error('No source image found to download');
+                return;
+            }
+            link.download = `ascii-photo-${timestamp}-original.png`;
+            link.href = resultDisplay.src;
+        }
+
+        console.log('Triggering download for:', link.download);
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
     }
 
     function downloadTXT() {

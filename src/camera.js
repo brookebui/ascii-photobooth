@@ -9,6 +9,7 @@ export async function startCamera() {
     }
 
     try {
+        console.log('Requesting camera access...');
         const stream = await navigator.mediaDevices.getUserMedia({
             video: {
                 width: { ideal: 1280 },
@@ -17,17 +18,25 @@ export async function startCamera() {
             },
             audio: false
         });
+        console.log('Camera access granted. Stream:', stream);
 
         videoElement.srcObject = stream;
         videoStream = stream;
 
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             videoElement.onloadedmetadata = () => {
-                videoElement.play();
-                resolve(videoElement);
+                console.log('Video metadata loaded. Attempting to play...');
+                videoElement.play().then(() => {
+                    console.log('Video playing successfully.');
+                    resolve(videoElement);
+                }).catch(e => {
+                    console.error('Error playing video:', e);
+                    reject(e);
+                });
             };
         });
     } catch (err) {
+        console.error('Error in startCamera:', err.name, err.message);
         throw err;
     }
 }
